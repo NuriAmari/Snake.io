@@ -1,0 +1,69 @@
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body style="width: 100%; height: 100%; overflow: hidden; margin:0; padding:0;">
+  <canvas id = "background" style="position: absolute; z-index: 1;"></canvas>
+  <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; background: #FF5733; padding: 20px; width: 180px; border-radius: 15px;" >
+    <form method="POST" action="/startGame">
+      <input type="text" name="name" placeholder="Enter Name" style="width:100%; height: 40px; text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 20px;">
+      <input class="button" type="submit" value="Submit" style="width: 100%; margin-top: 10px;">
+    </form>
+  </div >
+  <script src="./socket.io/socket.io.js"></script>
+  <script>
+
+  const button = document.getElementById("playButton");
+  const canvas = document.getElementById("background");
+  const bgContext = canvas.getContext("2d");
+
+  window.addEventListener("resize", resize);
+
+  var bw = window.innerWidth;
+  var bh = window.innerHeight;
+
+  canvas.height = bh;
+  canvas.width = bw;
+
+  drawBoard(bh, bw);
+
+  function resize() {
+
+    bw = window.innerWidth;
+    bh = window.innerHeight;
+
+    canvas.height = bh;
+    canvas.width = bw;
+
+    bgContext.clearRect(0,0,bw, bh);
+
+    drawBoard(bh, bw);
+
+    console.log("Width " + bw + " Height: " + bh);
+  }
+
+  function drawBoard(_bh, _bw) {
+
+    for (var x = 0; x <= _bw; x += 20) {
+		    bgContext.moveTo(x , 0);
+		    bgContext.lineTo(x, _bh);
+		}
+
+		for (var x = 0; x <= _bh; x += 20) {
+		    bgContext.moveTo(0, x);
+		    bgContext.lineTo(_bw, x);
+		}
+
+		bgContext.strokeStyle = "#D3D3D3";
+		bgContext.stroke();
+
+    console.log("redraw");
+	}
+
+  </script>
+
+
+
+</body>
+
+</html>

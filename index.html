@@ -1,0 +1,251 @@
+<div id="score" style="position: fixed; left: 20; top: 20; z-index: 3; background: black; color: white; text-align: center; padding:10px; font-family: Arial, Helvetica, sans-serif;">Score: 0</div>
+<div id="leaderboard" style="position: fixed; right: 20; top: 20; z-index: 4; padding: 10px; font-family: Arial, Helvetica, sans-serif; text-align: center; width: 100px; height 300px; background: white; border-style: solid; border-color: #d7d7d7; border-width: 2px;">
+	<table>
+		<tr>
+			<td>1</td>
+			<td id="1"></td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td id="2"></td>
+		</tr>
+		<tr>
+			<td>3</td>
+			<td id="3"></td>
+		</tr>
+		<tr>
+			<td>4</td>
+			<td id="4"></td>
+		</tr>
+		<tr>
+			<td>5</td>
+			<td id="5"></td>
+		</tr>
+	</table>
+</div>
+<div id="wrapper" style="position: static, width: 100%; height: 100%; overflow: hidden">
+		<canvas id="background" width="3600" height="3600" style="position: relative; left: 0; top: 0; z-index: 1;"></canvas>
+		<canvas id="frequent" width="3600" height="3600" style="position: relative; left: 0; top: -3600; z-index: 2;"></canvas>
+</div>
+<script src="./socket.io/socket.io.js"></script>
+
+<script type="text/javascript">
+
+	const bgCanvas = document.getElementById("background");
+	const bgContext = bgCanvas.getContext("2d");
+	//const scoreText = document.getElementById("score");
+	const frontCanvas = document.getElementById("frequent");
+	const context = frontCanvas.getContext("2d");
+	const scoreText= document.getElementById("score");
+
+	const wrapper = document.getElementById('wrapper');
+
+	const playerSize = 20;
+
+	const row1 = document.getElementById("1");
+	const row2 = document.getElementById("2");
+	const row3 = document.getElementById("3");
+	const row4 = document.getElementById("4");
+	const row5 = document.getElementById("5");
+
+	var highScores = [];
+
+	var sessionID;
+	var windowX;
+	var windowY;
+
+	var bw = bgCanvas.width;
+	var bh = bgCanvas.height;
+	var p = 0;
+
+	var img = new Image;
+
+	/*var headupImg = new Image;
+	var headleftImg = new Image;
+	var headrightImg = new Image;
+	var headdownImg = new Image;
+	var bodynorthEastImg = new Image;
+	var bodynorthWestImg = new Image;
+	var bodysouthEastImg = new Image;
+	var bodysouthWestImg = new Image;
+	var bodyImg = new Image;
+	var tailupImg = new Image;
+	var taildownImg = new Image;
+	var tailrightImg = new Image;
+	var tailleftImg = new Image;
+
+	headupImg.src = "img/headup.png";
+	headleftImg.src = "img/headleft.png";
+	headrightImg.src = "img/headright.png";
+	headdownImg.src = "img/headright.png";
+	bodynorthEastImg.src = "img/bodynorth-east.png";
+	bodynorthWestImg.src = "img/bodynorth-west.png";
+	bodysouthEastImg.src = "img/bodysouth-east.png";
+	bodysouthWestImg.src = "img/bodysouth-west.png";
+	tailupImg.src = "img/tailup.png";
+	taildownImg.src = "img/taildown.png";
+	tailleftImg.src = "img/tailleft.png";
+	tailrightImg.src = "img/tailright.png";
+	bodyImg.src = "img/body.png";
+
+	var images = {
+		headup: headupImg,
+		headleft: headleftImg,
+		headright: headrightImg,
+		headdown: headdownImg,
+		bodynortheast: bodynorthEastImg,
+		bodynorthwest: bodynorthWestImg,
+		bodysoutheast: bodysouthEastImg,
+		bodysouthwest: bodysouthWestImg,
+		body: bodyImg
+	};*/
+
+	var score = 0;
+
+	drawBoard();
+
+	var socket = io();
+
+	function drawBoard(){
+
+		for (var x = 0; x <= bw; x += 20) {
+		    bgContext.moveTo(x , 0);
+		    bgContext.lineTo(x, bh);
+		}
+
+		for (var x = 0; x <= bh; x += 20) {
+		    bgContext.moveTo(0, x);
+		    bgContext.lineTo(bw, x);
+		}
+
+		bgContext.strokeStyle = "#D3D3D3";
+		bgContext.stroke();
+	}
+
+	socket.on("newPosition", function(data) {
+
+		//console.log(images["bodysouthWest"]);
+
+		context.clearRect(0,0,frontCanvas.width, frontCanvas.height);
+
+		context.fillStyle = "#000";
+
+		scoreText.innerHTML = "Score: " + score;
+
+		highScores = [];
+
+		for (var i = 0; i < data.length; i++) {
+
+			if (data[i].id === sessionID) {
+
+				windowX = Scale(data[i].positions[0].x) - window.innerWidth / 2;
+				windowY = Scale(data[i].positions[0].y) - window.innerHeight / 2;
+
+				score = data[i].score;
+			}
+
+
+			highScores.push({name:data[i].name, score:data[i].score});
+			highScores = sortScores(highScores);
+
+			for (var j = 0; j < data[i].positions.length; j++) {
+
+				img = new Image;
+
+				//context.fillRect(Scale(data[i].positions[j].x) + 1, Scale(data[i].positions[j].y) + 1, playerSize - 2, playerSize - 2);
+				img.src = "/img/" + data[i].positions[j].type + ".png";
+				console.log(img.src);
+				context.drawImage(img, Scale(data[i].positions[j].x), Scale(data[i].positions[j].y));
+			}
+
+		}
+
+		if (data.length > 0) {
+
+			row1.innerHTML = highScores[0].score + " " + highScores[0].name;
+		}
+
+		if (data.length > 1) {
+
+			row2.innerHTML = highScores[1].score + " " + highScores[1].name;
+		}
+
+		if (data.length > 2) {
+
+			row3.innerHTML = highScores[2].score + " " + highScores[2].name;
+		}
+
+		if (data.length > 3) {
+
+			row4.innerHTML = highScores[3].score + " " + highScores[3].name;
+		}
+
+		if (data.length > 4) {
+
+			row5.innerHTML = highScores[4].score + " " + highScores[4].name;
+		}
+
+		context.fillStyle = "#FF0000";
+
+		for (var i = 0; i < data[0].snacks.length; i++) {
+
+			context.fillRect(Scale(data[0].snacks[i].x) + 1, Scale(data[0].snacks[i].y) + 1, playerSize - 2, playerSize - 2);
+		}
+
+		scrollWrapper(windowX, windowY);
+	});
+
+	socket.on("ID", function(data) {
+
+		sessionID = data.id;
+	});
+
+	function scrollWrapper(x, y) {
+	    wrapper.scrollTop = y;
+	    wrapper.scrollLeft = x;
+	}
+
+	document.onkeydown = function(event) {
+
+		if (event.keyCode === 39) {
+
+			socket.emit("keyPress", {inputId:"right"});
+		}
+
+		else if (event.keyCode === 40) {
+
+			socket.emit("keyPress", {inputId:"down"});
+		}
+
+		else if (event.keyCode === 37) {
+
+			socket.emit("keyPress", {inputId:"left"});
+		}
+
+		else if (event.keyCode === 38) {
+
+			socket.emit("keyPress", {inputId:"up"});
+		}
+	}
+
+	var Scale = function(i) {
+
+		return i * playerSize;
+	}
+
+	var sortScores = function(scoreList) {
+
+		var tempScoreList = [];
+
+		var compare = function (a, b) {
+
+			return b.score - a.score;
+		}
+
+		scoreList = scoreList.sort(compare);
+
+		return scoreList;
+	}
+
+
+</script>

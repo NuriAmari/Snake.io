@@ -1,0 +1,53 @@
+.button {
+  margin-right: 10px;
+  width: 100px;
+  background: #e67e22;
+  border-bottom: #d35400 3px solid;
+  border-left: #d35400 1px solid;
+  border-right: #d35400 1px solid;
+  border-radius: 6px;
+  text-align: center;
+  color: white;
+  padding: 10px;
+  float: left;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.button:hover {
+  opacity: 0.8;
+}
+
+.button:active {
+  width: 100px;
+  background: #CE6F17;
+  border-bottom: #d35400 1px solid;
+  border-left: #d35400 1px solid;
+  border-right: #d35400 1px solid;
+  border-radius: 6px;
+  text-align: center;
+  color: white;
+  padding: 10px;
+  margin-top: 3px;
+  float: left;
+}
+
+button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+textarea, input, button { outline: none; }
+
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #C0C0C0;
+}
+::-moz-placeholder { /* Firefox 19+ */
+  color: #C0C0C0;
+}
+:-ms-input-placeholder { /* IE 10+ */
+  color: #C0C0C0;
+}
+:-moz-placeholder { /* Firefox 18- */
+  color: #C0C0C0;
+}
